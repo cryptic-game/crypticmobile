@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(CrypticMobile());
@@ -8,6 +10,7 @@ class CrypticMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CrypticMobile',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
@@ -37,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
+            Image(image:  AssetImage('assets/cryptic-placeholder.png'),),
             Text(
               '\nWelcome to CrypticMobile',
               textScaleFactor: 2,
