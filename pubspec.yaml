@@ -1,4 +1,4 @@
-name: crypticmobile
+name: CrypticMobile
 description: A mobile frontend for Cryptic
 
 # The following defines the version and build number for your application.
@@ -27,7 +27,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.7.2
 
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/cryptic.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

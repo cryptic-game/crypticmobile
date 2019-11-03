@@ -9,12 +9,11 @@ class CrypticMobile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CrypticMobile',
-      debugShowCheckedModeBanner: false,
+      title: 'Cryptic Mobile',
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: LoginPage(title: 'CrypticMobile'),
+      home: LoginPage(title: 'Cryptic Mobile'),
     );
   }
 }
@@ -40,9 +39,9 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Image(image:  AssetImage('assets/cryptic-placeholder.png'),),
+            Image(image:  AssetImage('assets/cryptic.png'),),
             Text(
-              '\nWelcome to CrypticMobile',
+              '\nWelcome to Cryptic Mobile',
               textScaleFactor: 2,
             ),
           ],
