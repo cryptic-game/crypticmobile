@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
@@ -10,8 +9,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Cryptic Mobile")),
+      appBar: AppBar(title: Text("Cryptic Mobile")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -23,6 +21,11 @@ class _HomePageState extends State<HomePage> {
               '\nWelcome to Cryptic Mobile',
               textScaleFactor: 2,
             ),
+            RaisedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, "/login");
+              },
+            )
           ],
         ),
       ),
