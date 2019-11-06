@@ -17,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final userController = TextEditingController();
   final passwordController = TextEditingController();
 
-  _LoginScreenState() {}
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +37,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final loginButon = RaisedButton(
       color: Color(0xff01A0C7),
       padding: const EdgeInsets.all(0.0),
-      onPressed: () async* {
+      onPressed: () async {
         var username = userController.text;
         var password = passwordController.text;
 
+        print(Request.activeRequest);
+
         Request(jsonDecode(
                 '{"action": "login", "name": "$username", "password": "$password"}'))
-            .subscribe( (data) => print(data)  );
+            .subscribe((var data){
+              print("The returned Request data is + " + data.toString());
+        });
 
         //socket.sendJson('{"action": "register", "name": "mibkvr", "mail": "mibkvr@web.de", "password": "mibkvr11#"}');
 

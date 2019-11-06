@@ -8,22 +8,31 @@ class CrypticSocket {
   Timer timer;
 
   static CrypticSocket socket;
-  final IOWebSocketChannel channel =
-      IOWebSocketChannel.connect("wss://ws.test.cryptic-game.net/");
+
+  IOWebSocketChannel channel;
 
   CrypticSocket() {
     socket = this;
+    channel = IOWebSocketChannel.connect("wss://ws.test.cryptic-game.net/");
 
-    channel.stream.listen((data) {
+
+    /*channel.stream.listen((data) => (data) {
+      print("This is Sparta");
       print(data);
       print(Request.activeRequest);
-      if (Request.activeRequest != null)
-        Request.activeRequest.handle(jsonDecode(data));
-    }, onError: (error, StackTrace stackTrace) {
-      print("Error" + error);
-    }, onDone: () {
-      print("Connection CLosed");
+      //if (Request.activeRequest != null)
+      //  Request.activeRequest.handle(jsonDecode(data));
     });
+    */
+
+    channel.stream.listen((data) {
+      handledData(data);
+    }, onDone: () {
+      print("Task Done");
+    }, onError: (error) {
+      print("Some Error");
+    });
+
 
     /*timer = Timer.periodic(
         Duration(seconds: 25),
@@ -35,9 +44,17 @@ class CrypticSocket {
 
   static CrypticSocket getInstance() => socket;
 
-  sendRequest(Request request) async* {
+  sendRequest(Request request) async {
     print("sendRequesrt");
     Request.activeRequest = request;
-    channel.sink.add(request.data.toString());
+    print("Request.data" + request.requestData.toString());
+    channel.sink.add(request.requestData.toString());
+  }
+
+  void handledData(var data)async{
+    print("DataHandled" +data);
+    print(Request.activeRequest);
+    if (Request.activeRequest != null)
+      Request.activeRequest.handle(jsonDecode(data));
   }
 }

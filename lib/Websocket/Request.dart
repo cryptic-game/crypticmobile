@@ -6,41 +6,41 @@ import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
 class Request {
   static Request activeRequest;
   Function callback;
-  var data;
+  var requestAnswer;
+  var requestData;
 
   Request(var json) {
     print("Create Request");
     while (activeRequest != null) {
       sleep(Duration(milliseconds: 250));
     }
+    requestData = json;
     CrypticSocket.getInstance().sendRequest(this);
   }
 
   void handle(var json)async {
     print(json);
     if (json.containsKey("tag")) {
-      data = json["data"];
+      requestAnswer = json["data"];
     } else {
-      data = json;
+      requestAnswer = json;
     }
   }
 
-  subscribe(void onData(data)) async{
+  subscribe(Function callback) async{
 
 
     int k = 0;
-    while (data == null && k < 40) {
+    while (requestAnswer == null && k < 40) {
       sleep(Duration(milliseconds: 250));
       k++;
     }
 
     activeRequest = null;
 
-    if (data == null) data = jsonDecode("{}");
-    print("End of Subscribe!");
-    print(data);
+    if (requestAnswer == null) requestAnswer = jsonDecode("{}");
     if (callback != null) {
-      onData(data);
+      callback(requestAnswer);
     }
   }
 }

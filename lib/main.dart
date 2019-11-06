@@ -1,6 +1,5 @@
 import 'package:CrypticMobile/LoginScreen/LoginScreen.dart';
 import 'package:CrypticMobile/LoginScreen/RegisterScreen.dart';
-import 'package:CrypticMobile/Websocket/CrypticHandler.dart';
 import 'package:flutter/material.dart';
 
 import 'Websocket/CrypticSocket.dart';
