@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:CrypticMobile/Websocket/Request.dart';
+import 'package:CrypticMobile/main.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,7 +15,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final userController = TextEditingController();
   final passwordController = TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -43,16 +41,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
         print(Request.activeRequest);
 
-        Request(jsonDecode(
-                '{"action": "login", "name": "$username", "password": "$password"}'))
-            .subscribe((var data){
-              print("The returned Request data is + " + data.toString());
+        Request('{"action": "login", "name": "$username", "password": "$password"}')
+            .subscribe((var data)async {
+          print("The returned Request data is + " + data.toString());
+          if (data.containsKey("token")){
+            await CrypticMobile.storage.write(key: "token", value: data['token']);
+            Navigator.of(context).pushReplacementNamed("/home");
+          }else{
+            print("Login Failed" + data.toString());
+          }
         });
-
-        //socket.sendJson('{"action": "register", "name": "mibkvr", "mail": "mibkvr@web.de", "password": "mibkvr11#"}');
-
-        //socket.sendJson(
-        //    '{"action": "login", "name": "$username", "password": "$password"}"');
       },
       child: Text('Login',
           style: TextStyle(fontFamily: 'Montserrat', fontSize: 20.0)),

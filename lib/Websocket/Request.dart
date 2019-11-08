@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,42 +6,48 @@ import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
 
 class Request {
   static Request activeRequest;
-  Function callback;
+  Function requestCallback;
   var requestAnswer;
   var requestData;
+  bool requestReturned = false;
 
   Request(var json) {
-    print("Create Request");
+    requestData = json;
+    sendRequest();
+  }
+
+  void sendRequest()async{
     while (activeRequest != null) {
       sleep(Duration(milliseconds: 250));
     }
-    requestData = json;
+
     CrypticSocket.getInstance().sendRequest(this);
   }
 
-  void handle(var json)async {
-    print(json);
+  void handle(var json) async {
     if (json.containsKey("tag")) {
       requestAnswer = json["data"];
     } else {
       requestAnswer = json;
     }
+    closeRequest();
   }
 
-  subscribe(Function callback) async{
-
-
-    int k = 0;
-    while (requestAnswer == null && k < 40) {
-      sleep(Duration(milliseconds: 250));
-      k++;
+  void closeRequest() {
+    if (!requestReturned) {
+      requestReturned = true;
+      activeRequest = null;
+      if (requestAnswer == null) requestAnswer = jsonDecode("{}");
+      if (requestCallback != null) {
+        requestCallback(requestAnswer);
+      }
     }
+  }
 
-    activeRequest = null;
-
-    if (requestAnswer == null) requestAnswer = jsonDecode("{}");
-    if (callback != null) {
-      callback(requestAnswer);
-    }
+  subscribe(Function callback) async {
+    requestCallback = callback;
+    var timer = new Timer(const Duration(seconds: 30), () {
+      closeRequest();
+    });
   }
 }

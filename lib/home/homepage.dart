@@ -1,4 +1,7 @@
+import 'package:CrypticMobile/Websocket/Request.dart';
 import 'package:flutter/material.dart';
+
+import '../main.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -22,8 +25,32 @@ class _HomePageState extends State<HomePage> {
               textScaleFactor: 2,
             ),
             RaisedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/login");
+              child: Text("Start Game!"),
+              onPressed: () async {
+                if (await CrypticMobile.storage.read(key: "token") == null) {
+                  Navigator.pushReplacementNamed(context, "/login");
+                } else {
+                  Request('{"action": "info"}')
+                      .subscribe((var data) async {
+                    if (data.containsKey("error")) {
+                      var token = await CrypticMobile.storage.read(
+                          key: "token");
+                      Request('{"action":"session","token":"$token"}')
+                          .subscribe((data) async {
+                        if (data.containsKey("token")) {
+                          print("Token Request Done " + data.toString());
+                          print("Session now Valide");
+                          await CrypticMobile.storage.delete(key: "token");
+                          // TODO REDIRECT to main Screen
+                        } else {
+                          await CrypticMobile.storage.delete(key: "token");
+                          Navigator.pushReplacementNamed(context, "/login");
+                        }
+                      });
+                    }
+                  });
+                  //Navigator.pushReplacementNamed(context, "/home");
+                }
               },
             )
           ],

@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
 import 'package:CrypticMobile/Websocket/Request.dart';
 import 'package:flutter/material.dart';
+
+import '../main.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -24,7 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextField emailField;
   TextField passwordField;
   TextField passwordConfirmField;
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +64,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
       onPressed: () async {
         var username = userController.text;
         var password = passwordController.text;
+        var passwordNew = passwordConfirmController.text;
+        var email = emailController.text;
 
+        if (password == passwordNew) {
+          // TODO Handle wrong password
 
+          Request('{"action":"register","name":"$username","mail":"$email","password":"$password"}')
+              .subscribe((var data) async {
+            if (data.containsKey("token")) {
+              await CrypticMobile.storage
+                  .write(key: "token", value: data['token']);
+            } else if (data.containsKey("error")) {
+              switch (data["error"]) {
 
+                case "missing parameters":
+                  // TODO Handle missing parameters
+                  break;
+
+                case "invalid password":
+                  // TODO Handle invalid password
+                  break;
+
+                case "invalid email":
+                  // TODO Handle invalid email
+                  break;
+
+                case "username already exists":
+                  // TODO Handle username already exists
+                  break;
+
+                default:
+                  // TODO Handle Unknown Error
+                  break;
+              }
+            }
+          });
+        }
       },
       child: Text('Register',
           style: TextStyle(fontFamily: 'Montserrat', fontSize: 20.0)),
     );
 
-    final loginButon = OutlineButton(
+    final loginButton = OutlineButton(
       highlightedBorderColor: Colors.black,
       onPressed: () {
         Navigator.pushReplacementNamed(context, "/login");
@@ -108,7 +142,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     emailField,
                     passwordField,
                     passwordConfirmField,
-                    loginButon,
+                    loginButton,
                     registerButton,
                   ],
                 ),
