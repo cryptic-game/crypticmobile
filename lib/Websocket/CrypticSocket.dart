@@ -15,25 +15,8 @@ class CrypticSocket {
   CrypticSocket() {
     connectionOpen = true;
     socket = this;
-    channel = IOWebSocketChannel.connect("wss://ws.test.cryptic-game.net/");
 
-    /*channel.stream.listen((data) => (data) {
-      print("This is Sparta");
-      print(data);
-      print(Request.activeRequest);
-      //if (Request.activeRequest != null)
-      //  Request.activeRequest.handle(jsonDecode(data));
-    });
-    */
-
-    channel.stream.listen((data) {
-      handledData(data);
-    }, onDone: () {
-      connectionOpen = false;
-      print("Task Done");
-    }, onError: (error) {
-      print("Some Error");
-    });
+    tryConnect();
 
     timer = Timer.periodic(
         Duration(seconds: 25),
@@ -48,23 +31,30 @@ class CrypticSocket {
     if (connectionOpen) {
       Request.activeRequest = request;
       channel.sink.add(request.requestData.toString());
-    }else{
-      socket.reconnect();
-      if(recall == null){
-        recall= 0;
+    } else {
+      socket.tryConnect();
+      if (recall == null) {
+        recall = 0;
       }
       print(recall);
-      if (recall < 5)
-      sendRequest(request,recall: recall + 1);
-
+      if (recall < 5) sendRequest(request, recall: recall + 1);
     }
   }
 
-  void reconnect(){
+  void tryConnect() async {
     print("Reconnect Socket");
-    // Todo Fix it --> Currently not Working
+
     channel = null;
     channel = IOWebSocketChannel.connect("wss://ws.test.cryptic-game.net/");
+    channel.stream.listen((data) {
+      handledData(data);
+    }, onDone: () {
+      connectionOpen = false;
+      print("Task Done");
+      print("Websocket Connection Closed");
+    }, onError: (error) {
+      print("Some Error");
+    });
     connectionOpen = true;
   }
 
