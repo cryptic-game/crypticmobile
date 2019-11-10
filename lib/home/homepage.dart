@@ -42,7 +42,17 @@ class _HomePageState extends State<HomePage> {
                       AuthClient().loginSession(
                           token: token,
                           onLogin: () {
-                            //TODO Start Game
+                            skey.currentState.showSnackBar(SnackBar(
+                              content: Text("Soon --> Already Login"),
+                            ));
+                            print("Logout User to Test Things");
+
+
+                            //TODO Must be removed
+                            CrypticMobile.storage.deleteAll();
+                            Request('{"action":"logout"}').subscribe((data){
+                              print(data);
+                            });
                           },
                           onTimeout: () {
                             skey.currentState.showSnackBar(SnackBar(
@@ -50,12 +60,12 @@ class _HomePageState extends State<HomePage> {
                             ));
                           },
                           onLogout: () {
-                            NavigationService.pushNamed("/login");
+                            NavigationService.pushNamedReplacement("/login");
                           });
                     }
                   });
                 } else
-                  NavigationService.pushNamed("/login");
+                  NavigationService.pushNamedReplacement("/login");
               },
             )
           ],
