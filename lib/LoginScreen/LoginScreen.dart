@@ -1,5 +1,5 @@
-import 'package:CrypticMobile/Websocket/Request.dart';
-import 'package:CrypticMobile/main.dart';
+import 'package:CrypticMobile/NavigationService.dart';
+import 'package:CrypticMobile/Websocket/AuthClient.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,6 +10,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
+
   TextStyle style =
       TextStyle(fontFamily: 'Montserrat', fontSize: 20.0, color: Colors.white);
 
@@ -39,24 +41,25 @@ class _LoginScreenState extends State<LoginScreen> {
         var username = userController.text;
         var password = passwordController.text;
 
-        print(Request.activeRequest);
-
-        Request('{"action": "login", "name": "$username", "password": "$password"}')
-            .subscribe((var data)async {
-          print("The returned Request data is + " + data.toString());
-          if (data.containsKey("token")){
-            await CrypticMobile.storage.write(key: "token", value: data['token']);
-            Navigator.of(context).pushReplacementNamed("/home");
-          }else{
-            print("Login Failed" + data.toString());
-          }
-        });
+        AuthClient().login(
+            username: username,
+            password: password,
+            onLogin: () {
+              NavigationService.pushNamedReplacement("/home");
+            },
+            onLoginFailed: () {
+              passwordController.clear();
+              key.currentState.showSnackBar(SnackBar(
+                content: Text("Login Failed"),
+              ));
+            });
       },
       child: Text('Login',
           style: TextStyle(fontFamily: 'Montserrat', fontSize: 20.0)),
     );
 
     return Scaffold(
+      key: key,
       body: Center(
         child: Container(
           child: Padding(

@@ -1,3 +1,5 @@
+import 'package:CrypticMobile/NavigationService.dart';
+import 'package:CrypticMobile/Websocket/AuthClient.dart';
 import 'package:CrypticMobile/Websocket/Request.dart';
 import 'package:flutter/material.dart';
 
@@ -9,9 +11,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  GlobalKey<ScaffoldState> skey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: skey,
       appBar: AppBar(title: Text("Cryptic Mobile")),
       body: Center(
         child: Column(
@@ -27,30 +32,30 @@ class _HomePageState extends State<HomePage> {
             RaisedButton(
               child: Text("Start Game!"),
               onPressed: () async {
-                if (await CrypticMobile.storage.read(key: "token") == null) {
-                  Navigator.pushReplacementNamed(context, "/login");
-                } else {
-                  Request('{"action": "info"}')
-                      .subscribe((var data) async {
+                var token = await CrypticMobile.storage.read(key: "token");
+                if (token != null) {
+                  Request('{"action": "info"}').subscribe((var data) async {
                     if (data.containsKey("error")) {
-                      var token = await CrypticMobile.storage.read(
-                          key: "token");
-                      Request('{"action":"session","token":"$token"}')
-                          .subscribe((data) async {
-                        if (data.containsKey("token")) {
-                          print("Token Request Done " + data.toString());
-                          print("Session now Valide");
-                          await CrypticMobile.storage.delete(key: "token");
-                          // TODO REDIRECT to main Screen
-                        } else {
-                          await CrypticMobile.storage.delete(key: "token");
-                          Navigator.pushReplacementNamed(context, "/login");
-                        }
-                      });
+                      var token =
+                          await CrypticMobile.storage.read(key: "token");
+
+                      AuthClient().loginSession(
+                          token: token,
+                          onLogin: () {
+                            //TODO Start Game
+                          },
+                          onTimeout: () {
+                            skey.currentState.showSnackBar(SnackBar(
+                              content: Text("Not Connected to the Internet"),
+                            ));
+                          },
+                          onLogout: () {
+                            NavigationService.pushNamed("/login");
+                          });
                     }
                   });
-                  //Navigator.pushReplacementNamed(context, "/home");
-                }
+                } else
+                  NavigationService.pushNamed("/login");
               },
             )
           ],

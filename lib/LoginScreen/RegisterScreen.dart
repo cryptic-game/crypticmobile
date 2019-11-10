@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:CrypticMobile/Websocket/Request.dart';
+import 'package:CrypticMobile/Websocket/AuthClient.dart';
 import 'package:flutter/material.dart';
-
-import '../main.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -13,6 +11,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
   TextStyle style =
       TextStyle(fontFamily: 'Montserrat', fontSize: 20.0, color: Colors.white);
 
@@ -64,42 +63,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
       onPressed: () async {
         var username = userController.text;
         var password = passwordController.text;
-        var passwordNew = passwordConfirmController.text;
+        var passwordConfirm = passwordConfirmController.text;
         var email = emailController.text;
 
-        if (password == passwordNew) {
-          // TODO Handle wrong password
-
-          Request('{"action":"register","name":"$username","mail":"$email","password":"$password"}')
-              .subscribe((var data) async {
-            if (data.containsKey("token")) {
-              await CrypticMobile.storage
-                  .write(key: "token", value: data['token']);
-            } else if (data.containsKey("error")) {
-              switch (data["error"]) {
-
-                case "missing parameters":
-                  // TODO Handle missing parameters
-                  break;
-
-                case "invalid password":
-                  // TODO Handle invalid password
-                  break;
-
-                case "invalid email":
-                  // TODO Handle invalid email
-                  break;
-
-                case "username already exists":
-                  // TODO Handle username already exists
-                  break;
-
-                default:
-                  // TODO Handle Unknown Error
-                  break;
-              }
-            }
-          });
+        if (password == passwordConfirm)
+          AuthClient().register(
+              username: username,
+              email: email,
+              password: password,
+              onRegister: () {},
+              onInvalidEmail: () => emailController.clear(),
+              onInvalidPassword: () {
+                passwordController.clear();
+                passwordConfirmController.clear();
+                //TODO Show error Message
+              },
+              onMissingParameters: () => key.currentState.showSnackBar(SnackBar(
+                    content: Text("Missing Parameters"),
+                  )),
+              onTimeout: () => key.currentState.showSnackBar(SnackBar(
+                    content: Text("Network Timeout"),
+                  )),
+              onUsernameExists: () {
+                userController.clear();
+                key.currentState.showSnackBar(SnackBar(
+                  content: Text("Username already Exists"),
+                ));
+              },
+              onUnknownError: () {
+                key.currentState
+                    .showSnackBar(SnackBar(content: Text("Unknwon Error!")));
+              });
+        else {
+          passwordConfirmController.clear();
+          passwordController.clear();
+          key.currentState.showSnackBar(SnackBar(
+            content: Text("Not the Same Password"),
+          ));
         }
       },
       child: Text('Register',
@@ -115,40 +115,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     return Scaffold(
-      body: Center(
+      key: key,
+      body: SingleChildScrollView(
+          child: Center(
         child: Container(
           child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SingleChildScrollView(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  runSpacing: 10.0,
-                  children: <Widget>[
-                    ClipOval(
-                      child: Image.asset(
-                        "assets/cryptic.png",
-                        fit: BoxFit.cover,
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                    Center(
-                      child: Text("Cryptic Mobile || Register", style: style),
-                    ),
-                    SizedBox(
-                      height: 75.0,
-                    ),
-                    userField,
-                    emailField,
-                    passwordField,
-                    passwordConfirmField,
-                    loginButton,
-                    registerButton,
-                  ],
+            padding: const EdgeInsets.all(20.0),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runSpacing: 10.0,
+              children: <Widget>[
+                ClipOval(
+                  child: Image.asset(
+                    "assets/cryptic.png",
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                  ),
                 ),
-              )),
+                Center(
+                  child: Text("Cryptic Mobile || Register", style: style),
+                ),
+                SizedBox(
+                  height: 75.0,
+                ),
+                userField,
+                emailField,
+                passwordField,
+                passwordConfirmField,
+                loginButton,
+                registerButton,
+              ],
+            ),
+          ),
         ),
-      ),
+      )),
     );
   }
 

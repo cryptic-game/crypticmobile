@@ -1,5 +1,7 @@
 import 'package:CrypticMobile/LoginScreen/LoginScreen.dart';
 import 'package:CrypticMobile/LoginScreen/RegisterScreen.dart';
+import 'package:CrypticMobile/NavigationService.dart';
+import 'package:CrypticMobile/Websocket/AuthClient.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -23,6 +25,7 @@ class CrypticMobile extends StatelessWidget {
           primarySwatch: Colors.green,
         ),
         home: HomePage(),
+        navigatorKey: NavigationService.navigatorKey,
         routes: {
           "/home": (_) => new HomePage(),
           "/login": (_) => new LoginScreen(),
