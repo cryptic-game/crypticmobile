@@ -106,7 +106,7 @@ class AuthClient {
       if (data.containsKey("error")) {
         c.complete(false);
       }else{
-        c.complete(false);
+        c.complete(true);
       }
     });
 
