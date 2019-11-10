@@ -99,16 +99,15 @@ class AuthClient {
     });
   }
 
-  Future<bool> isLogin() {
-    //TODO Make this Working
+  Future<dynamic> isLogin() {
     Completer c = new Completer();
     Request('{"action": "info"}').subscribe((var data) async {
       print(data);
       if (data.containsKey("error")) {
-
+        c.complete(false);
+      }else{
         c.complete(false);
       }
-
     });
 
     return c.future;

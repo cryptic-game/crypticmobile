@@ -11,12 +11,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  GlobalKey<ScaffoldState> skey = new GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: skey,
+      key: key,
       appBar: AppBar(title: Text("Cryptic Mobile")),
       body: Center(
         child: Column(
@@ -34,28 +34,18 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 var token = await CrypticMobile.storage.read(key: "token");
                 if (token != null) {
-                  Request('{"action": "info"}').subscribe((var data) async {
-                    if (data.containsKey("error")) {
+
+                    if (!await AuthClient().isLogin()) {
                       var token =
                           await CrypticMobile.storage.read(key: "token");
 
                       AuthClient().loginSession(
                           token: token,
                           onLogin: () {
-                            skey.currentState.showSnackBar(SnackBar(
-                              content: Text("Soon --> Already Login"),
-                            ));
-                            print("Logout User to Test Things");
-
-
-                            //TODO Must be removed
-                            CrypticMobile.storage.deleteAll();
-                            Request('{"action":"logout"}').subscribe((data){
-                              print(data);
-                            });
+                            startGame();
                           },
                           onTimeout: () {
-                            skey.currentState.showSnackBar(SnackBar(
+                            key.currentState.showSnackBar(SnackBar(
                               content: Text("Not Connected to the Internet"),
                             ));
                           },
@@ -63,7 +53,10 @@ class _HomePageState extends State<HomePage> {
                             NavigationService.pushNamedReplacement("/login");
                           });
                     }
-                  });
+                    else {
+                      startGame();
+                    }
+
                 } else
                   NavigationService.pushNamedReplacement("/login");
               },
@@ -72,5 +65,17 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void startGame(){
+    //TODO Game need to be Started
+    key.currentState.showSnackBar(SnackBar(
+      content: Text("Soon --> Already Login"),
+    ));
+    print("Logout User to Test Things");
+    CrypticMobile.storage.deleteAll();
+    Request('{"action":"logout"}').subscribe((data){
+      print(data);
+    });
   }
 }
