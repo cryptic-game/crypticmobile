@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
+import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class Request {
   static Request activeRequest;
@@ -16,7 +18,7 @@ class Request {
     sendRequest();
   }
 
-  void sendRequest()async{
+  void sendRequest() async {
     while (activeRequest != null) {
       sleep(Duration(milliseconds: 250));
     }
@@ -49,5 +51,18 @@ class Request {
     var timer = new Timer(const Duration(seconds: 30), () {
       closeRequest();
     });
+  }
+
+  static Request buildRequest(
+      {@required var ms,
+      @required var endpoint,
+      @required var data,
+      @required Function callback}) {
+    return Request({
+      'tag': new Uuid().v4(),
+      'ms': ms,
+      'endpoint': endpoint,
+      'data': data
+    }).subscribe(callback);
   }
 }
