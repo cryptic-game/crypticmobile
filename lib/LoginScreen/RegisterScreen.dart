@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:CrypticMobile/NavigationService.dart';
 import 'package:CrypticMobile/Websocket/AuthClient.dart';
 import 'package:flutter/material.dart';
 
@@ -71,7 +72,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               username: username,
               email: email,
               password: password,
-              onRegister: () {},
+              onRegister: () {
+                NavigationService.pushNamedReplacement("/start");
+              },
               onInvalidEmail: () => emailController.clear(),
               onInvalidPassword: () {
                 passwordController.clear();
@@ -160,15 +163,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void dataHandler(data) {
-    print(data);
-    var json = jsonDecode(data);
-    if (json.containsKey("token")) {
-      Navigator.pushReplacementNamed(context, "/home");
-    } else if (json.containsKey("error")) {
-      if (json['error'] == "permissions denied") {
-        passwordController.clear();
-      }
-    }
-  }
 }

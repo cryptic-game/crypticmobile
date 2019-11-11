@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
+import 'package:flutter/material.dart';
 
 class Request {
   static Request activeRequest;
@@ -11,7 +12,7 @@ class Request {
   var requestData;
   bool requestReturned = false;
 
-  Request(var json) {
+  Request(json) {
     requestData = json;
     sendRequest();
   }
@@ -50,4 +51,5 @@ class Request {
       closeRequest();
     });
   }
+
 }

@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:CrypticMobile/Websocket/Request.dart';
 import 'package:web_socket_channel/io.dart';
 
+import 'User.dart';
+
 class CrypticSocket {
   Timer timer;
 
@@ -13,6 +15,8 @@ class CrypticSocket {
   IOWebSocketChannel channel;
 
   CrypticSocket() {
+    User();
+
     connectionOpen = true;
     socket = this;
 

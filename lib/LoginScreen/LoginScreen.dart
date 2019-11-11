@@ -41,11 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
         var username = userController.text;
         var password = passwordController.text;
 
+        if (! await AuthClient().isLogin())
         AuthClient().login(
             username: username,
             password: password,
             onLogin: () {
-              NavigationService.pushNamedReplacement("/home");
+              NavigationService.pushNamedReplacement("/start");
             },
             onLoginFailed: () {
               passwordController.clear();
@@ -53,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 content: Text("Login Failed"),
               ));
             });
+        else NavigationService.pushNamedReplacement("/start");
       },
       child: Text('Login',
           style: TextStyle(fontFamily: 'Montserrat', fontSize: 20.0)),
@@ -107,14 +109,5 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void dataHandler(var data) {
-    print("dataHandler" + data.toString());
-    if (data.containsKey("token")) {
-      Navigator.pushReplacementNamed(context, "/home");
-    } else if (data.containsKey("error")) {
-      if (data['error'] == "permissions denied") {
-        passwordController.clear();
-      }
-    }
-  }
+
 }

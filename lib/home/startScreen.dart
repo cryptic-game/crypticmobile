@@ -1,16 +1,17 @@
 import 'package:CrypticMobile/NavigationService.dart';
 import 'package:CrypticMobile/Websocket/AuthClient.dart';
 import 'package:CrypticMobile/Websocket/Request.dart';
+import 'package:CrypticMobile/Websocket/User.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
 
-class HomePage extends StatefulWidget {
+class StartScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _HomePageState();
+  State<StatefulWidget> createState() => _StartScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _StartScreenState extends State<StartScreen> {
   GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
 
   @override
@@ -32,6 +33,10 @@ class _HomePageState extends State<HomePage> {
             RaisedButton(
               child: Text("Start Game!"),
               onPressed: () async {
+                //NavigationService.pushNamedReplacement("/home");
+                //return null;
+
+
                 var token = await CrypticMobile.storage.read(key: "token");
                 if (token != null) {
 
@@ -50,6 +55,7 @@ class _HomePageState extends State<HomePage> {
                             ));
                           },
                           onLogout: () {
+
                             NavigationService.pushNamedReplacement("/login");
                           });
                     }
@@ -68,14 +74,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void startGame(){
-    //TODO Game need to be Started
-    key.currentState.showSnackBar(SnackBar(
-      content: Text("Soon --> Already Login"),
-    ));
-    print("Logout User to Test Things");
-    CrypticMobile.storage.deleteAll();
-    Request('{"action":"logout"}').subscribe((data){
-      print(data);
-    });
+    User.currentUser.requestUserInformation();
+    NavigationService.pushNamedReplacement("/home");
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:CrypticMobile/NavigationService.dart';
+import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
@@ -106,12 +107,27 @@ class AuthClient {
       if (data.containsKey("error")) {
         c.complete(false);
       }else{
-        c.complete(false);
+        c.complete(true);
       }
     });
 
     return c.future;
 
 
+  }
+
+  void logout(){
+    CrypticMobile.storage.deleteAll();
+    Request('{"action": "logout"}').subscribe((var data) async {
+      print(data);
+      if (data.containsKey("status")) {
+        NavigationService.pushNamedReplacement("/start");
+      }
+      else{
+        NavigationService.pushNamedReplacement("/start");
+        //Hard Logout by reconnecting to Socket
+        CrypticSocket.socket.tryConnect();
+      }
+    });
   }
 }
