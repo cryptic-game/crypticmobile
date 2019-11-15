@@ -54,7 +54,7 @@ class GlobalDrawer extends StatelessWidget {
         ListTile(
           title: Text("Settings"),
           onTap: () {
-            AuthClient().logout();
+            Navigator.pushReplacementNamed(context, "/home");
           },
         ),
         ListTile(

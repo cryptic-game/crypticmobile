@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
             username: username,
             password: password,
             onLogin: () {
-              NavigationService.pushNamedReplacement("/start");
+              NavigationService.pushNamedReplacement("/home");
             },
             onLoginFailed: () {
               passwordController.clear();
