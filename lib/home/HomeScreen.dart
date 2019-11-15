@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget{
         Image(
           image: AssetImage('assets/cryptic.png'),
         ),
-        Text("This is the Homescreen --> you are logget in!")
+        Text("This is the Homescreen --> You are logged in!")
       ],)
 
 

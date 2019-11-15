@@ -22,11 +22,9 @@ class CrypticSocket {
 
     tryConnect();
 
-    timer = Timer.periodic(
+    timer = new Timer.periodic(
         Duration(seconds: 25),
-        (Timer t) => () {
-              Request('{"action":"info"}').subscribe((data) {});
-            });
+            (Timer t) => Request('{"action":"info"}').subscribe((data) {}));
   }
 
   static CrypticSocket getInstance() => socket;
