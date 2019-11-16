@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:CrypticMobile/NavigationService.dart';
+import 'package:CrypticMobile/Websocket/CrypticSocket.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
@@ -83,15 +84,21 @@ class AuthClient {
       {@required String token,
       @required Function onLogin,
       Function onTimeout,
-      Function onLogout}) {
+      Function onLogout}) async {
+    print("Login Session");
+
     Request('{"action":"session","token":"$token"}').subscribe((data) async {
-      if (data.containsKey("token")) {
-        await CrypticMobile.storage.write(key: "token", value: data['token']);
-        if (onLogin != null) onLogin();
-      } else if (data.containsKey("error")) {
+      print(data);
+      if (data.containsKey("error")) {
+
         await CrypticMobile.storage.delete(key: "token");
         if (onLogout != null) onLogout();
-      } else {
+
+      } else if (data.containsKey("token")) {
+        await CrypticMobile.storage.write(key: "token", value: data['token']);
+        if (onLogin != null) onLogin();
+      }  else {
+
         if (onTimeout != null) {
           onTimeout();
         }
@@ -102,16 +109,32 @@ class AuthClient {
   Future<dynamic> isLogin() {
     Completer c = new Completer();
     Request('{"action": "info"}').subscribe((var data) async {
-      print(data);
       if (data.containsKey("error")) {
         c.complete(false);
-      }else{
+      } else {
         c.complete(true);
       }
     });
 
     return c.future;
+  }
 
-
+  void logout() {
+    print("Logout!");
+    print("Delete Token");
+    CrypticMobile.storage.deleteAll();
+    print("Logout Socket");
+    Request('{"action": "logout"}').subscribe((var data) async {
+      if (data.containsKey("status")) {
+        print("Logout Socket successfull");
+        NavigationService.pushNamedReplacement("/start");
+      } else {
+        print("Logout Socket failed");
+        print("Logout Socket by reconnecting");
+        NavigationService.pushNamedReplacement("/start");
+        //Hard Logout by reconnecting to Socket
+        CrypticSocket.socket.tryConnect();
+      }
+    });
   }
 }

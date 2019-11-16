@@ -4,25 +4,23 @@ import 'dart:convert';
 import 'package:CrypticMobile/Websocket/Request.dart';
 import 'package:web_socket_channel/io.dart';
 
+import 'User.dart';
+
 class CrypticSocket {
   Timer timer;
-
+  static const String ServerUrl = "wss://ws.test.cryptic-game.net/";
   static CrypticSocket socket;
   bool connectionOpen = false;
 
-  IOWebSocketChannel channel;
+  IOWebSocketChannel _channel;
 
   CrypticSocket() {
+    User();
     connectionOpen = true;
     socket = this;
-
     tryConnect();
-
-    timer = Timer.periodic(
-        Duration(seconds: 25),
-        (Timer t) => () {
-              Request('{"action":"info"}').subscribe((data) {});
-            });
+    timer = new Timer.periodic(Duration(seconds: 25),
+        (Timer t) => Request('{"action":"info"}').subscribe((data) {}));
   }
 
   static CrypticSocket getInstance() => socket;
@@ -30,7 +28,7 @@ class CrypticSocket {
   sendRequest(Request request, {int recall}) async {
     if (connectionOpen) {
       Request.activeRequest = request;
-      channel.sink.add(request.requestData.toString());
+      _channel.sink.add(request.requestData.toString());
     } else {
       socket.tryConnect();
       if (recall == null) {
@@ -42,18 +40,20 @@ class CrypticSocket {
   }
 
   void tryConnect() async {
-    print("Reconnect Socket");
+    print("(re)connect to Socket");
 
-    channel = null;
-    channel = IOWebSocketChannel.connect("wss://ws.test.cryptic-game.net/");
-    channel.stream.listen((data) {
+    _channel = null;
+    _channel = IOWebSocketChannel.connect(ServerUrl);
+
+    _channel.stream.listen((data) {
+      print("CrypticSocket:   Data Recived");
       handledData(data);
     }, onDone: () {
       connectionOpen = false;
-      print("Task Done");
-      print("Websocket Connection Closed");
-    }, onError: (error) {
-      print("Some Error");
+      print("CrypticSocket:   Socket connection closed!");
+    }, onError: (error, StackTrace stackTrace) {
+      print("CrypticSocket:   Error occurred in stream" + error);
+      print(stackTrace);
     });
     connectionOpen = true;
   }
